@@ -334,6 +334,14 @@ impl KeyNodeItemRange {
         Some(Ok(key_node_item_range))
     }
 
+    fn timestamp<'h, B>(&self, hive: &'h Hive<B>) -> Result<u64>
+    where
+        B: SplitByteSlice,
+    {
+        let header = self.header(hive);
+        Ok(header.timestamp.get())
+    }
+
     fn validate_signature<B>(&self, hive: &Hive<B>) -> Result<()>
     where
         B: SplitByteSlice,
@@ -458,6 +466,12 @@ where
             hive: self.hive,
             item_range,
         }))
+    }
+
+    /// Returns the timestamp of this Key Node in the FILETIME format.
+    /// i.e. the number of 100-nanosecond intervals since January 1, 1601 (UTC).
+    pub fn timestamp(&self) -> Result<u64> {
+        self.item_range.timestamp(self.hive)
     }
 
     /// Finds a single value by name.
